@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Number Locator - Phone Tracker</string>
+
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_mph">mi/h</string>
+    <string name="unit_ms">m/s</string>
+    <string name="unit_fts">ft/s</string>
+    <string name="speed_unit_formating">%1$s %2$s</string>
+    <string name="WeatherID">0c8210e1d90e8441fc10a759d2e8a874</string>
+    <string name="GOOGLE_MAP_KEY">AIzaSyDkLf7MaEEM98L8tMgGVRpi1RqBJ0ImEe4</string>
+
+    <string name="enableGPS">モバイル GPS をオンにする</string>
+    <string name="current_speed">現在の速度</string>
+    <string name="unknown">未知</string>
+    <string name="setting_service_label">スピードメーター</string>
+    <string name="permissionDeneid">許可が拒否されました</string>
+    <string name="number_detector">携帯電話番号検索</string>
+    <string name="install">インストール</string>
+    <string name="current_location">現在位置</string>
+    <string name="locator_tool">ロケーターツール</string>
+    <string name="manage_phone">電話の管理</string>
+    <string name="data_usage">データ使用量</string>
+    <string name="number_location">番号の場所</string>
+    <string name="number_locator">ナンバーロケーター</string>
+    <string name="current_locator">現在のロケータ</string>
+    <string name="speedometer">スピードメーター</string>
+    <string name="search_country_number">国番号の検索</string>
+    <string name="settings">設定</string>
+    <string name="rate_us">私たちを評価してください</string>
+    <string name="share_app">アプリを共有する</string>
+    <string name="privacy_policy">プライバシーポリシー</string>
+    <string name="app_version">アプリのバージョン</string>
+    <string name="stop_testing">テストの停止</string>
+    <string name="start_testing">テストを開始する</string>
+    <string name="keep_updating_while_screen_is_off">画面がオフになっている間も更新を続ける</string>
+    <string name="lets_start">はじめましょう</string>
+    <string name="do_you_want_to_exit">退出しますか?</string>
+    <string name="cancel">キャンセル</string>
+    <string name="exit">出口</string>
+    <string name="thank_you_for_using_our_app">私たちのアプリをご利用いただきありがとうございます!</string>
+    <string name="rate_us_subtitle">私たちのアプリは役に立ち、便利だと思いましたか? 評価して他の人に知らせましょう!</string>
+    <string name="rate_now">今すぐ評価してください</string>
+    <string name="app_language">アプリの言語</string>
+</resources>

@@ -1,0 +1,149 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
+android {
+    namespace 'com.phone.tracker.locate.number.app'
+    compileSdk 33
+    buildFeatures{
+        viewBinding true
+    }
+    defaultConfig {
+        applicationId "com.phone.tracker.locate.number.app"
+        minSdk 24
+        targetSdk 33
+        versionCode 9
+        versionName "1.0.8"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled true
+            shrinkResources true
+
+            resValue "string", "appId", "ca-app-pub-3940256099942544~3347511713"
+            resValue "string", "openAppId", "ca-app-pub-3940256099942544/3419835294"
+
+            resValue "string", "interstial_Id", "ca-app-pub-3940256099942544/1033173712"
+
+            resValue "string", "home_native", "ca-app-pub-3940256099942544/2247696110"
+            resValue "string", "splash_nativeId", "ca-app-pub-3940256099942544/2247696110"
+            resValue "string", "exit_nativeId", "ca-app-pub-3940256099942544/2247696110"
+            resValue "string", "speedoMeter_screen_nativeId", "ca-app-pub-3940256099942544/2247696110"
+            resValue "string", "locatortool_nativeId", "ca-app-pub-3940256099942544/2247696110"
+            resValue "string", "setting_natice", "ca-app-pub-3940256099942544/2247696110"
+            resValue "string", "dialog_native", "ca-app-pub-3940256099942544/2247696110"
+            resValue "string", "language_native", "ca-app-pub-3940256099942544/2247696110"
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+
+            resValue "string", "appId", "ca-app-pub-1806257797828593~1017605259"
+            resValue "string", "openAppId", "ca-app-pub-1806257797828593/5536554328"
+
+            resValue "string", "interstial_Id", "ca-app-pub-1806257797828593/5777023634"
+
+            resValue "string", "home_native", "ca-app-pub-1806257797828593/2416363121"
+            resValue "string", "splash_nativeId", "ca-app-pub-1806257797828593/7751654124"
+            resValue "string", "exit_nativeId", "ca-app-pub-1806257797828593/2307755755"
+            resValue "string", "speedoMeter_screen_nativeId", "ca-app-pub-1806257797828593/6985367364"
+            resValue "string", "locatortool_nativeId", "ca-app-pub-1806257797828593/5644365531"
+            resValue "string", "setting_natice", "ca-app-pub-1806257797828593/8078957185"
+            resValue "string", "dialog_native", "ca-app-pub-1806257797828593/8301502167"
+            resValue "string", "language_native", "ca-app-pub-1806257797828593/4225707540"
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    //recyclerview
+    implementation("androidx.recyclerview:recyclerview:1.3.1")
+
+    //size
+    implementation 'com.intuit.ssp:ssp-android:1.1.0'
+    implementation 'com.intuit.sdp:sdp-android:1.1.0'
+
+    implementation "com.airbnb.android:lottie:6.0.0"
+
+    implementation 'com.hbb20:ccp:2.5.0'
+
+
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation "androidx.lifecycle:lifecycle-process:2.6.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.1"
+
+    implementation 'io.insert-koin:koin-android:3.3.0'
+
+    // retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
+    implementation "com.squareup.okhttp3:logging-interceptor:4.5.0"
+
+    implementation 'com.github.anastr:speedviewlib:1.6.0'
+
+
+    // Facebook Shimmer Effect dependency
+    implementation 'com.facebook.shimmer:shimmer:0.5.0@aar'
+
+    // Adds dependency last
+    implementation 'com.google.android.gms:play-services-ads:22.3.0'
+
+    //  firebase crashlytics and analytics
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.4.1'
+
+    // Google firebase-messaging.
+    implementation 'com.google.firebase:firebase-messaging:23.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+
+    /* RX */
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
+
+    //Work Manager dependency
+    implementation 'androidx.work:work-runtime:2.8.1'
+
+    implementation platform('com.google.firebase:firebase-bom:32.2.3')
+
+    // in app review
+    implementation 'com.google.android.play:review:2.0.1'
+
+    // For Kotlin users also add the Kotlin extensions library for Play In-App Review:
+    implementation 'com.google.android.play:review-ktx:2.0.1'
+}

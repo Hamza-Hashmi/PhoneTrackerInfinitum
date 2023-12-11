@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Number Locator - Phone Tracker</string>
+
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_mph">mi/h</string>
+    <string name="unit_ms">m/s</string>
+    <string name="unit_fts">ft/s</string>
+    <string name="speed_unit_formating">%1$s %2$s</string>
+    <string name="WeatherID">0c8210e1d90e8441fc10a759d2e8a874</string>
+    <string name="GOOGLE_MAP_KEY">AIzaSyDkLf7MaEEM98L8tMgGVRpi1RqBJ0ImEe4</string>
+
+    <string name="enableGPS">قم بتشغيل نظام تحديد المواقع العالمي (GPS) على هاتفك المحمول</string>
+    <string name="current_speed">السرعة الحالية</string>
+    <string name="unknown">مجهول</string>
+    <string name="setting_service_label">عداد السرعة</string>
+    <string name="permissionDeneid">تم رفض الإذن</string>
+    <string name="number_detector">مكتشف رقم الجوال</string>
+    <string name="install">ثَبَّتَ</string>
+    <string name="current_location">الموقع الحالي</string>
+    <string name="locator_tool">أداة تحديد المواقع</string>
+    <string name="manage_phone">إدارة الهاتف</string>
+    <string name="data_usage">استخدام البيانات</string>
+    <string name="number_location">موقع الرقم</string>
+    <string name="number_locator">محدد الرقم</string>
+    <string name="current_locator">محدد الموقع الحالي</string>
+    <string name="speedometer">عداد السرعة</string>
+    <string name="search_country_number">البحث عن رقم الدولة</string>
+    <string name="settings">إعدادات</string>
+    <string name="rate_us">قيمنا</string>
+    <string name="share_app">شارك التطبيق</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="app_version">نسخة التطبيق</string>
+    <string name="stop_testing">توقف عن الاختبار</string>
+    <string name="start_testing">ابدأ الاختبار</string>
+    <string name="keep_updating_while_screen_is_off">استمر في التحديث أثناء إيقاف تشغيل الشاشة</string>
+    <string name="lets_start">لنبدأ</string>
+    <string name="do_you_want_to_exit">هل تريد الخروج؟</string>
+    <string name="cancel">يلغي</string>
+    <string name="exit">مخرج</string>
+    <string name="thank_you_for_using_our_app">شكرا لك على استخدام التطبيق لدينا!</string>
+    <string name="rate_us_subtitle">هل وجدت تطبيقنا مفيدًا ومريحًا؟ دع الآخرين يعرفون من خلال تقييمنا!</string>
+    <string name="rate_now">قيم الآن</string>
+    <string name="app_language">لغة التطبيق</string>
+</resources>

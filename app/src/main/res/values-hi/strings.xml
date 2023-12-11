@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Number Locator - Phone Tracker</string>
+
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_mph">mi/h</string>
+    <string name="unit_ms">m/s</string>
+    <string name="unit_fts">ft/s</string>
+    <string name="speed_unit_formating">%1$s %2$s</string>
+    <string name="WeatherID">0c8210e1d90e8441fc10a759d2e8a874</string>
+    <string name="GOOGLE_MAP_KEY">AIzaSyDkLf7MaEEM98L8tMgGVRpi1RqBJ0ImEe4</string>
+
+    <string name="enableGPS">अपने मोबाइल का जीपीएस चालू करें</string>
+    <string name="current_speed">वर्तमान गति</string>
+    <string name="unknown">अज्ञात</string>
+    <string name="setting_service_label">स्पीडोमीटर</string>
+    <string name="permissionDeneid">अनुमति नहीं मिली</string>
+    <string name="number_detector">मोबाइल नंबर खोजक</string>
+    <string name="install">स्थापित करना</string>
+    <string name="current_location">वर्तमान स्थान</string>
+    <string name="locator_tool">लोकेटर उपकरण</string>
+    <string name="manage_phone">फ़ोन प्रबंधित करें</string>
+    <string name="data_usage">डेटा उपयोग में लाया गया</string>
+    <string name="number_location">संख्या स्थान</string>
+    <string name="number_locator">नंबर लोकेटर</string>
+    <string name="current_locator">वर्तमान लोकेटर</string>
+    <string name="speedometer">स्पीडोमीटर</string>
+    <string name="search_country_number">देश संख्या खोजें</string>
+    <string name="settings">समायोजन</string>
+    <string name="rate_us">हमें रेटिंग दें</string>
+    <string name="share_app">ऐप शेयर करें</string>
+    <string name="privacy_policy">गोपनीयता नीति</string>
+    <string name="app_version">एप्लिकेशन वेरीज़न</string>
+    <string name="stop_testing">परीक्षण बंद करो</string>
+    <string name="start_testing">परीक्षण प्रारंभ करें</string>
+    <string name="keep_updating_while_screen_is_off">स्क्रीन बंद होने पर अपडेट करते रहें</string>
+    <string name="lets_start">चलो शुरू करो</string>
+    <string name="do_you_want_to_exit">क्या आपको बाहर निकलना है?</string>
+    <string name="cancel">रद्द करना</string>
+    <string name="exit">बाहर निकलना</string>
+    <string name="thank_you_for_using_our_app">हमारे ऐप का उपयोग करने के लिए धन्यवाद!</string>
+    <string name="rate_us_subtitle">क्या आपको हमारा ऐप उपयोगी और सुविधाजनक लगा? हमें रेटिंग देकर दूसरों को बताएं!</string>
+    <string name="rate_now">अब रेट करें</string>
+    <string name="app_language">ऐप भाषा</string>
+</resources>

@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Number Locator - Phone Tracker</string>
+
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_mph">mi/h</string>
+    <string name="unit_ms">m/s</string>
+    <string name="unit_fts">ft/s</string>
+    <string name="speed_unit_formating">%1$s %2$s</string>
+    <string name="WeatherID">0c8210e1d90e8441fc10a759d2e8a874</string>
+    <string name="GOOGLE_MAP_KEY">AIzaSyDkLf7MaEEM98L8tMgGVRpi1RqBJ0ImEe4</string>
+
+    <string name="enableGPS">আপনার মোবাইল জিপিএস চালু করুন</string>
+    <string name="current_speed">বর্তমান গতি</string>
+    <string name="unknown">অজানা</string>
+    <string name="setting_service_label">স্পিডোমিটার</string>
+    <string name="permissionDeneid">অনুমতি অস্বীকার করা হয়েছে</string>
+    <string name="number_detector">মোবাইল নম্বর ফাইন্ডার</string>
+    <string name="install">ইনস্টল করুন</string>
+    <string name="current_location">এখন যেখানে আছ</string>
+    <string name="locator_tool">লোকেটার টুল</string>
+    <string name="manage_phone">ফোন পরিচালনা করুন</string>
+    <string name="data_usage">তথ্য ব্যবহার</string>
+    <string name="number_location">নম্বর অবস্থান</string>
+    <string name="number_locator">নম্বর লোকেটার</string>
+    <string name="current_locator">বর্তমান লোকেটার</string>
+    <string name="speedometer">স্পিডোমিটার</string>
+    <string name="search_country_number">দেশের নম্বর অনুসন্ধান করুন</string>
+    <string name="settings">সেটিংস</string>
+    <string name="rate_us">আমাদের ব্যাপারে আপনার মতামত দিন</string>
+    <string name="share_app">অ্যাপ্লিকেশন ভাগ করা</string>
+    <string name="privacy_policy">গোপনীয়তা নীতি</string>
+    <string name="app_version">অ্যাপ সংস্করণ</string>
+    <string name="stop_testing">পরীক্ষা বন্ধ করুন</string>
+    <string name="start_testing">পরীক্ষা শুরু করুন</string>
+    <string name="keep_updating_while_screen_is_off">স্ক্রিন বন্ধ থাকা অবস্থায় আপডেট করতে থাকুন</string>
+    <string name="lets_start">চল শুরু করি</string>
+    <string name="do_you_want_to_exit">আপনি কি প্রস্থান করতে চান?</string>
+    <string name="cancel">বাতিল করুন</string>
+    <string name="exit">প্রস্থান করুন</string>
+    <string name="thank_you_for_using_our_app">আমাদের অ্যাপ্লিকেশন ব্যবহার করার জন্য আপনাকে ধন্যবাদ!</string>
+    <string name="rate_us_subtitle">আপনি কি আমাদের অ্যাপটিকে সহায়ক এবং সুবিধাজনক বলে মনে করেছেন? আমাদের রেটিং দিয়ে অন্যদের জানতে দিন!</string>
+    <string name="rate_now">এখন রেট</string>
+    <string name="app_language">অ্যাপের ভাষা</string>
+</resources>

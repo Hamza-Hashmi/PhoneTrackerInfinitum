@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Number Locator - Phone Tracker</string>
+
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_mph">mi/h</string>
+    <string name="unit_ms">m/s</string>
+    <string name="unit_fts">ft/s</string>
+    <string name="speed_unit_formating">%1$s %2$s</string>
+    <string name="WeatherID">0c8210e1d90e8441fc10a759d2e8a874</string>
+    <string name="GOOGLE_MAP_KEY">AIzaSyDkLf7MaEEM98L8tMgGVRpi1RqBJ0ImEe4</string>
+
+    <string name="enableGPS">Включите свой мобильный GPS</string>
+    <string name="current_speed">Текущая скорость</string>
+    <string name="unknown">Неизвестный</string>
+    <string name="setting_service_label">Спидометр</string>
+    <string name="permissionDeneid">Доступ запрещен</string>
+    <string name="number_detector">Поиск мобильного номера</string>
+    <string name="install">УСТАНОВИТЬ</string>
+    <string name="current_location">Текущее местоположение</string>
+    <string name="locator_tool">Инструмент локатора</string>
+    <string name="manage_phone">Управление телефоном</string>
+    <string name="data_usage">Использование данных</string>
+    <string name="number_location">Номер Расположение</string>
+    <string name="number_locator">Локатор номеров</string>
+    <string name="current_locator">Текущий локатор</string>
+    <string name="speedometer">Спидометр</string>
+    <string name="search_country_number">Поиск по номеру страны</string>
+    <string name="settings">Настройки</string>
+    <string name="rate_us">Оцените нас</string>
+    <string name="share_app">Поделиться приложением</string>
+    <string name="privacy_policy">политика конфиденциальности</string>
+    <string name="app_version">Версия приложения</string>
+    <string name="stop_testing">Прекратить тестирование</string>
+    <string name="start_testing">Начать тестирование</string>
+    <string name="keep_updating_while_screen_is_off">Продолжайте обновлять, пока экран выключен</string>
+    <string name="lets_start">Давайте начнем</string>
+    <string name="do_you_want_to_exit">Вы хотите выйти?</string>
+    <string name="cancel">Отмена</string>
+    <string name="exit">Выход</string>
+    <string name="thank_you_for_using_our_app">Благодарим вас за использование нашего приложения!</string>
+    <string name="rate_us_subtitle">Наше приложение показалось вам полезным и удобным? Дайте другим знать, оценивая нас!</string>
+    <string name="rate_now">Оценить сейчас</string>
+    <string name="app_language">Язык приложения</string>
+</resources>

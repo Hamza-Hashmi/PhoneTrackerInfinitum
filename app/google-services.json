@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "287381021634",
+    "project_id": "number-locator---phone-t-7f6c2",
+    "storage_bucket": "number-locator---phone-t-7f6c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287381021634:android:b5112d654831e11f036c5b",
+        "android_client_info": {
+          "package_name": "com.phone.tracker.locate.number.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "287381021634-aumb36heg7hucpoa0pioqbsrobufen1a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI3xbn5lx9HXSW67Zlwdg5fMD_6LAkYoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "287381021634-aumb36heg7hucpoa0pioqbsrobufen1a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

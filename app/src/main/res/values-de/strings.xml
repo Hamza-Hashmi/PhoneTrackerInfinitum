@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Number Locator - Phone Tracker</string>
+
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_mph">mi/h</string>
+    <string name="unit_ms">m/s</string>
+    <string name="unit_fts">ft/s</string>
+    <string name="speed_unit_formating">%1$s %2$s</string>
+    <string name="WeatherID">0c8210e1d90e8441fc10a759d2e8a874</string>
+    <string name="GOOGLE_MAP_KEY">AIzaSyDkLf7MaEEM98L8tMgGVRpi1RqBJ0ImEe4</string>
+
+    <string name="enableGPS">Schalten Sie Ihr mobiles GPS ein</string>
+    <string name="current_speed">Momentane Geschwindigkeit</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="setting_service_label">Tachometer</string>
+    <string name="permissionDeneid">Zugriff verweigert</string>
+    <string name="number_detector">Handynummern-Finder</string>
+    <string name="install">INSTALLIEREN</string>
+    <string name="current_location">Aktueller Standort</string>
+    <string name="locator_tool">Locator-Tool</string>
+    <string name="manage_phone">Telefon verwalten</string>
+    <string name="data_usage">Datenverbrauch</string>
+    <string name="number_location">Nummernstandort</string>
+    <string name="number_locator">Nummernfinder</string>
+    <string name="current_locator">Aktueller Locator</string>
+    <string name="speedometer">Tachometer</string>
+    <string name="search_country_number">Ländernummer suchen</string>
+    <string name="settings">Einstellungen</string>
+    <string name="rate_us">Bewerten Sie uns</string>
+    <string name="share_app">App teilen</string>
+    <string name="privacy_policy">Datenschutzrichtlinie</string>
+    <string name="app_version">App Version</string>
+    <string name="stop_testing">Hören Sie auf zu testen</string>
+    <string name="start_testing">Beginnen Sie mit dem Testen</string>
+    <string name="keep_updating_while_screen_is_off">Aktualisieren Sie weiter, während der Bildschirm ausgeschaltet ist</string>
+    <string name="lets_start">Lasst uns beginnen</string>
+    <string name="do_you_want_to_exit">Möchtest du aussteigen?</string>
+    <string name="cancel">Stornieren</string>
+    <string name="exit">Ausfahrt</string>
+    <string name="thank_you_for_using_our_app">Vielen Dank, dass Sie unsere App nutzen!</string>
+    <string name="rate_us_subtitle">Fanden Sie unsere App hilfreich und praktisch? Teilen Sie es anderen mit, indem Sie uns bewerten!</string>
+    <string name="rate_now">Jetzt bewerten</string>
+    <string name="app_language">App-Sprache</string>
+</resources>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <application
+        android:name="com.number.locator.phone.tracker.app.MyApp.AppClass"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher_foreground"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PhoneTrackerHamza"
+        tools:targetApi="31"
+        android:largeHeap="true">
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.LanguagesActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.ActivityLocatorTools"
+            android:exported="false" />
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.ActivitySpeedoMeter"
+            android:exported="false" />
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.CurrentLocationActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.ActivityNumberLocator"
+            android:exported="false" />
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.number.locator.phone.tracker.app.ui.activities.MainActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/GOOGLE_MAP_KEY" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
+        <service
+            android:name=".services.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.number.locator.phone.tracker.app.broadcasts.FireBaseBroadcastReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.number.locator.phone.tracker.app.services.CustomSpeedometerService"
+            android:foregroundServiceType="location" />
+
+        <receiver
+            android:name="com.number.locator.phone.tracker.app.broadcasts.RootBroadCast"
+            android:enabled="true"
+            android:exported="false"
+            tools:ignore="IntentFilterExportedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".services.SettingsService"
+            android:exported="false"
+            android:icon="@drawable/ic_speedpmeter"
+            android:label="@string/setting_service_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            tools:ignore="IntentFilterExportedReceiver">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/appId" />
+    </application>
+
+</manifest>
