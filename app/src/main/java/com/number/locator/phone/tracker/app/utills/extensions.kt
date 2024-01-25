@@ -32,28 +32,18 @@ import io.reactivex.disposables.Disposable
 
 
 fun Context.isNetworkAvailable(): Boolean {
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-        val connectivityManager =
-            this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-        if (capabilities != null) {
-            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                return true
-            }
-            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                return true
-            }
-            return if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-                true
-            } else {
-                false
-            }
+    val connectivityManager =
+        this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val capabilities =
+        connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    if (capabilities != null) {
+        if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            return true
         }
-    } else {
-        val cm =
-            this.getSystemService(AppCompatActivity.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
+        if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+            return true
+        }
+        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
     }
     return false
 }

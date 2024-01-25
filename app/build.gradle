@@ -27,6 +27,7 @@ android {
         debug {
             minifyEnabled true
             shrinkResources true
+            debuggable true
 
             resValue "string", "appId", "ca-app-pub-3940256099942544~3347511713"
             resValue "string", "openAppId", "ca-app-pub-3940256099942544/3419835294"

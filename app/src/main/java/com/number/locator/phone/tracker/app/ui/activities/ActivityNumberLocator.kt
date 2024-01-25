@@ -11,6 +11,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -19,6 +20,10 @@ import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -34,13 +39,13 @@ import com.number.locator.phone.tracker.app.googleAds.loadAndReturnAd
 import com.number.locator.phone.tracker.app.googleAds.showLoadedNativeAd
 import com.number.locator.phone.tracker.app.googleAds.showPriorityInterstitialAdWithCounter
 import com.number.locator.phone.tracker.app.ui.base.BaseActivity
+import com.number.locator.phone.tracker.app.utills.PermissionUtils
 import com.number.locator.phone.tracker.app.utills.addContactNmbr
 import com.number.locator.phone.tracker.app.utills.callMe
 import com.number.locator.phone.tracker.app.utills.isNetworkAvailable
 import com.number.locator.phone.tracker.app.utills.showGPSDIALOGE
 import com.number.locator.phone.tracker.app.utills.showMsg
 import com.phone.tracker.locate.number.app.R
-import com.phone.tracker.locate.number.app.dataModel.InternetConnectivityCheckingLive
 import com.phone.tracker.locate.number.app.databinding.ActivityNumberLocatorBinding
 import com.phone.tracker.locate.number.app.utills.Constants.CountryCodees
 import com.phone.tracker.locate.number.app.utills.Constants.ListOfCountyNames
@@ -49,7 +54,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.util.Locale
 
 
@@ -68,14 +72,13 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
     lateinit var byteArray: ByteArray
     private var numberIsValid = false
     private var googleMap: GoogleMap? = null
-    var internetConnectivityCheck: InternetConnectivityCheckingLive? = null
-    var locationManager: LocationManager? = null
     var nativeAd: NativeAd? = null
-    private val TAG = "NumberLocator"
+    private val TAG = "Number_Locator"
     private var mapFragment: SupportMapFragment? = null
 
     private var reviewManager: ReviewManager? = null
     private var reviewInfo: ReviewInfo? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,47 +89,70 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
 
         binding = ActivityNumberLocatorBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-        clickEvents()
+
+        initViews()
         initEvents()
 
-        reviewManager = ReviewManagerFactory.create(this)
+        loadAd()
 
-        val request: Task<ReviewInfo> = reviewManager!!.requestReviewFlow()
-        request.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                // We can get the ReviewInfo object
-                reviewInfo = task.result
-            } else {
-                // There was some problem, continue regardless of the result.
-            }
-        }
-
-
-        if (isNetworkAvailable()) {
-            loadAndReturnAd(
-                this@ActivityNumberLocator,
-                nativeIdLow = getString(R.string.dialog_native)
-            ) {
-                nativeAd = it
-            }
-        }
-
+        initReviewManager()
     }
 
-    private fun clickEvents() {
+    private fun initViews() {
         binding?.apply {
-            internetConnectivityCheck = InternetConnectivityCheckingLive(this@ActivityNumberLocator)
-            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             countryName = preferences.getString(ListOfCountyNames, "Pakistan")
             countryCode = preferences.getString(CountryCodees, "+92")
             countryCodeString = preferences.getString(countriesCodeName, "PK")
-            locationViewModel.getLocationData().observe(this@ActivityNumberLocator) {
-                contactLocation = LatLng(it.lat, it.long)
-            }
+
+
             countryCodePicker.registerCarrierNumberEditText(enterNUmber)
             countryCodePicker.setCountryForNameCode(countryCode)
             countryCodePicker.setPhoneNumberValidityChangeListener { isValidNumber ->
                 numberIsValid = isValidNumber
+            }
+
+            when {
+                PermissionUtils.checkAccessFineLocationGranted(this@ActivityNumberLocator) -> {
+                    when {
+                        PermissionUtils.isLocationEnabled(this@ActivityNumberLocator) -> {
+                            setLocationListener()
+                        }
+                        else -> {
+                            PermissionUtils.showGPSNotEnabledDialog(this@ActivityNumberLocator)
+                        }
+                    }
+                }
+                else -> {
+                    PermissionUtils.requestLocationPermission(
+                        this@ActivityNumberLocator,
+                        123
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initEvents() {
+        binding?.apply {
+            backArrow.setOnClickListener {
+                onBackPressed()
+            }
+
+            btnSearch.setOnClickListener {
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    showGPSDIALOGE()
+                    showMsg("Please Turn On Your Mobile GPS")
+                } else {
+                    showPriorityInterstitialAdWithCounter(
+                        true,
+                        getString(R.string.interstial_Id)
+                    ) {
+
+                        searchNumber()
+                    }
+
+                }
             }
 
             countryCodePicker.setOnCountryChangeListener {
@@ -181,29 +207,79 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
         }
     }
 
-    private fun initEvents() {
-        binding?.apply {
-            backArrow.setOnClickListener {
 
-                  onBackPressed()
-            }
-            btnSearch.setOnClickListener {
-                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    showGPSDIALOGE()
-                    showMsg("Please Turn On Your Mobile GPS")
-                } else {
-                    showPriorityInterstitialAdWithCounter(
-                        true,
-                        getString(R.string.interstial_Id)
-                    ) {
-
-                        searchNumber()
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            // Location Permission
+            123 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    when {
+                        PermissionUtils.isLocationEnabled(this) -> {
+                            setupGoogleMap()
+                            // Setting things up
+                        }
+                        else -> {
+                            PermissionUtils.showGPSNotEnabledDialog(this)
+                        }
                     }
-
+                } else {
+                    Toast.makeText(this, "Not Granted", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+    }
+
+    private fun loadAd() {
+        if (isNetworkAvailable()) {
+            loadAndReturnAd(
+                this@ActivityNumberLocator,
+                nativeIdLow = getString(R.string.dialog_native)
+            ) {
+                nativeAd = it
+            }
+        }
+    }
+
+    private fun initReviewManager() {
+        reviewManager = ReviewManagerFactory.create(this)
+
+        val request: Task<ReviewInfo> = reviewManager!!.requestReviewFlow()
+        request.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // We can get the ReviewInfo object
+                reviewInfo = task.result
+            } else {
+                // There was some problem, continue regardless of the result.
+            }
+        }
+    }
+
+
+    @SuppressLint("MissingPermission")
+    private fun setLocationListener() {
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        // for getting the current location update after every 2 seconds with high accuracy
+        val locationRequest = LocationRequest().setInterval(2000).setFastestInterval(2000)
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    super.onLocationResult(locationResult)
+                    for (location in locationResult.locations) {
+                        contactLocation = LatLng(location.latitude, location.longitude)
+                        Log.d(TAG, "onLocationResult: ${LatLng(location.latitude, location.longitude)}")
+                        fusedLocationProviderClient.removeLocationUpdates(this)
+                        initializeGoogleMap()
+                    }
+                    // Things don't end here
+                    // You may also update the location on your web app
+                }
+            },
+            Looper.getMainLooper()
+        )
     }
 
     @SuppressLint("SetTextI18n")
@@ -223,37 +299,33 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream)
                     byteArray = stream.toByteArray()
                     bitMap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-                    internetConnectivityCheck?.observe(this@ActivityNumberLocator) {
-                        if (it) {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                contactLocation = getUserLocation(countryName)
-                                initializeGoogleMap()
-                            }.invokeOnCompletion { CoroutineScope(Dispatchers.Main).launch {
-                                contactLocation?.let {
-                                    try {
+                    if (isNetworkAvailable()) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            contactLocation = getUserLocation(countryName)
+                        }.invokeOnCompletion { CoroutineScope(Dispatchers.Main).launch {
+                            contactLocation?.let {
+                                try {
 
-                                        nativeAd?.let { it1 ->
-                                            showLoadedNativeAd(
-                                                this@ActivityNumberLocator,
-                                                binding?.layoutNative!!,
-                                                R.layout.native_ad_larg_layout,
-                                                it1
-                                            )
-                                        }
-                                        detialBottomSheet.visibility = View.VISIBLE
-                                        countryFlag.setImageBitmap(bitMap)
-                                        contactNo.text = countryCode + " " + mobileNumber
-                                        contryName.text = countryName
-                                        contryCode.text = countryCodeString
-                                    } catch (ee: Exception) {
+                                    nativeAd?.let { it1 ->
+                                        showLoadedNativeAd(
+                                            this@ActivityNumberLocator,
+                                            binding?.layoutNative!!,
+                                            R.layout.native_ad_larg_layout,
+                                            it1
+                                        )
                                     }
+                                    detialBottomSheet.visibility = View.VISIBLE
+                                    countryFlag.setImageBitmap(bitMap)
+                                    contactNo.text = countryCode + " " + mobileNumber
+                                    contryName.text = countryName
+                                    contryCode.text = countryCodeString
+                                } catch (ee: Exception) {
                                 }
-                            } }
+                            }
+                        } }
 
-                        } else {
-
-                            showMsg("Kindly Check your Internet Connection")
-                        }
+                    } else {
+                        showMsg("Kindly Check your Internet Connection")
                     }
                 } else {
                     showMsg("The number you have enter is incorrect please try again")
@@ -271,6 +343,7 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
         var positionNew: LatLng? = null
         try {
             address = countryName?.let { geoCoder.getFromLocationName(it, 5) }
+            Log.d(TAG, "getUserLocation: $address")
             if (address == null) {
                 return null
             }
@@ -285,7 +358,9 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
                 )
             }
         } catch (e: Exception) {
-            Log.e(TAG, "findLocation: ${e.message}")
+            CoroutineScope(Dispatchers.Main).launch {
+                Log.e(TAG, "findLocation: ${e.message}")
+            }
         }
         return positionNew
     }
@@ -296,8 +371,7 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
                 val fragManager = supportFragmentManager
                 mapFragment = fragManager.findFragmentById(R.id.googleMap) as SupportMapFragment?
                 mapFragment?.getMapAsync(this)
-            }
-            if (googleMap != null) {
+            } else {
                 setupGoogleMap()
             }
         }catch (_: Exception){}
@@ -322,13 +396,7 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
         try {
             googleMap = p0
             googleMap?.setOnMapLongClickListener(this)
-            val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                showGPSDIALOGE()
-                showMsg("Please Turn On  Mobile GPS")
-            } else {
-                setupGoogleMap()
-            }
+            setupGoogleMap()
         } catch (_: Exception){}
     }
 

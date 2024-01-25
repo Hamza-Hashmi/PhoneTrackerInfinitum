@@ -29,9 +29,6 @@ import com.phone.tracker.locate.number.app.utills.Constants.isFromBackPress
 import com.phone.tracker.locate.number.app.utills.Constants.permissionList
 
 class MainActivity : BaseActivity() {
-    private var locationManager: LocationManager? = null
-
-
     private lateinit var btnNumberLocator: ConstraintLayout
     private lateinit var btnCurrentLocation: ConstraintLayout
     private lateinit var btnSpeedoMeter: ConstraintLayout
@@ -69,8 +66,6 @@ class MainActivity : BaseActivity() {
         btnTool = findViewById(R.id.btnTools)
         btnSettings = findViewById(R.id.settingICon)
         layoutNative = findViewById(R.id.layout_native)
-
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         bottomSheetBinding = ExitDialogBinding.inflate(layoutInflater, binding.root, false)
         dialog = BottomSheetDialog(this@MainActivity)
@@ -120,7 +115,6 @@ class MainActivity : BaseActivity() {
         }
         btnCurrentLocation.setOnClickListener {
             startActivity(Intent(this@MainActivity, CurrentLocationActivity::class.java))
-
         }
         btnTool.setOnClickListener {
             startActivity(Intent(this@MainActivity, ActivityLocatorTools::class.java))
