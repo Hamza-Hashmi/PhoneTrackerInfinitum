@@ -29,6 +29,7 @@ import com.phone.tracker.locate.number.app.utills.Constants.isFromBackPress
 import com.phone.tracker.locate.number.app.utills.Constants.permissionList
 
 class MainActivity : BaseActivity() {
+    private lateinit var currentActivity: Class<*>
     private lateinit var btnNumberLocator: ConstraintLayout
     private lateinit var btnCurrentLocation: ConstraintLayout
     private lateinit var btnSpeedoMeter: ConstraintLayout
@@ -104,17 +105,22 @@ class MainActivity : BaseActivity() {
 
     private fun clickEvents() {
         btnNumberLocator.setOnClickListener {
+            currentActivity = ActivityNumberLocator::class.java
             if (requirePemissionDone()) {
-                startActivity(Intent(this@MainActivity, ActivityNumberLocator::class.java))
-
+                startActivity(Intent(this@MainActivity, currentActivity))
             } else {
                 Log.d("PermissionDtl", "Required")
                 requestPermission()
             }
-
         }
         btnCurrentLocation.setOnClickListener {
-            startActivity(Intent(this@MainActivity, CurrentLocationActivity::class.java))
+            currentActivity = CurrentLocationActivity::class.java
+            if (requirePemissionDone()) {
+                startActivity(Intent(this@MainActivity, currentActivity))
+            } else {
+                Log.d("PermissionDtl", "Required")
+                requestPermission()
+            }
         }
         btnTool.setOnClickListener {
             startActivity(Intent(this@MainActivity, ActivityLocatorTools::class.java))
@@ -147,7 +153,7 @@ class MainActivity : BaseActivity() {
             }
             if (granted) {
                 Log.d("PermissionDtl", "Granted")
-                startActivity(Intent(this@MainActivity, ActivityNumberLocator::class.java))
+                startActivity(Intent(this@MainActivity, currentActivity))
             } else {
                 Log.d("PermissionDtl", "Required2")
                 requestPermission()

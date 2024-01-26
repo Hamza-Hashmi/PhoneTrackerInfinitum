@@ -104,30 +104,10 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
             countryCode = preferences.getString(CountryCodees, "+92")
             countryCodeString = preferences.getString(countriesCodeName, "PK")
 
-
             countryCodePicker.registerCarrierNumberEditText(enterNUmber)
             countryCodePicker.setCountryForNameCode(countryCode)
             countryCodePicker.setPhoneNumberValidityChangeListener { isValidNumber ->
                 numberIsValid = isValidNumber
-            }
-
-            when {
-                PermissionUtils.checkAccessFineLocationGranted(this@ActivityNumberLocator) -> {
-                    when {
-                        PermissionUtils.isLocationEnabled(this@ActivityNumberLocator) -> {
-                            setLocationListener()
-                        }
-                        else -> {
-                            PermissionUtils.showGPSNotEnabledDialog(this@ActivityNumberLocator)
-                        }
-                    }
-                }
-                else -> {
-                    PermissionUtils.requestLocationPermission(
-                        this@ActivityNumberLocator,
-                        123
-                    )
-                }
             }
         }
     }
@@ -144,11 +124,7 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
                     showGPSDIALOGE()
                     showMsg("Please Turn On Your Mobile GPS")
                 } else {
-                    showPriorityInterstitialAdWithCounter(
-                        true,
-                        getString(R.string.interstial_Id)
-                    ) {
-
+                    showPriorityInterstitialAdWithCounter(true, getString(R.string.interstial_Id)) {
                         searchNumber()
                     }
 
@@ -207,29 +183,6 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
         }
     }
 
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            // Location Permission
-            123 -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    when {
-                        PermissionUtils.isLocationEnabled(this) -> {
-                            setupGoogleMap()
-                            // Setting things up
-                        }
-                        else -> {
-                            PermissionUtils.showGPSNotEnabledDialog(this)
-                        }
-                    }
-                } else {
-                    Toast.makeText(this, "Not Granted", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
     private fun loadAd() {
         if (isNetworkAvailable()) {
             loadAndReturnAd(
@@ -255,33 +208,6 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
         }
     }
 
-
-    @SuppressLint("MissingPermission")
-    private fun setLocationListener() {
-        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        // for getting the current location update after every 2 seconds with high accuracy
-        val locationRequest = LocationRequest().setInterval(2000).setFastestInterval(2000)
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-
-        fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            object : LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult) {
-                    super.onLocationResult(locationResult)
-                    for (location in locationResult.locations) {
-                        contactLocation = LatLng(location.latitude, location.longitude)
-                        Log.d(TAG, "onLocationResult: ${LatLng(location.latitude, location.longitude)}")
-                        fusedLocationProviderClient.removeLocationUpdates(this)
-                        initializeGoogleMap()
-                    }
-                    // Things don't end here
-                    // You may also update the location on your web app
-                }
-            },
-            Looper.getMainLooper()
-        )
-    }
-
     @SuppressLint("SetTextI18n")
     private fun searchNumber() {
         binding?.apply {
@@ -302,10 +228,11 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
                     if (isNetworkAvailable()) {
                         CoroutineScope(Dispatchers.IO).launch {
                             contactLocation = getUserLocation(countryName)
-                        }.invokeOnCompletion { CoroutineScope(Dispatchers.Main).launch {
+                        }.invokeOnCompletion {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                initializeGoogleMap()
                             contactLocation?.let {
                                 try {
-
                                     nativeAd?.let { it1 ->
                                         showLoadedNativeAd(
                                             this@ActivityNumberLocator,
@@ -343,23 +270,24 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
         var positionNew: LatLng? = null
         try {
             address = countryName?.let { geoCoder.getFromLocationName(it, 5) }
-            Log.d(TAG, "getUserLocation: $address")
             if (address == null) {
                 return null
             }
             if (address.isNotEmpty()) {
                 val location = address[0]
                 positionNew = LatLng(location.latitude, location.longitude)
-                googleMap?.addMarker(MarkerOptions().position(positionNew))
-                googleMap?.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(positionNew, 9.75f),
-                    3000,
-                    null
-                )
+                CoroutineScope(Dispatchers.Main).launch {
+                    googleMap?.addMarker(MarkerOptions().position(positionNew))
+                    googleMap?.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(positionNew, 9.75f),
+                        3000,
+                        null
+                    )
+                }
             }
         } catch (e: Exception) {
             CoroutineScope(Dispatchers.Main).launch {
-                Log.e(TAG, "findLocation: ${e.message}")
+                Log.d(TAG, "findLocation: ${e.message}")
             }
         }
         return positionNew
