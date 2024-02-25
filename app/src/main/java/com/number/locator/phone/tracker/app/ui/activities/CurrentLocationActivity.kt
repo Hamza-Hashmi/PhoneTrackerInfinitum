@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -37,9 +38,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class CurrentLocationActivity : BaseActivity(), OnMapReadyCallback,
+class CurrentLocationActivity : BaseActivity(),
     GoogleMap.OnMapLongClickListener {
-
+    private var smf: SupportMapFragment? = null
+    private var client: FusedLocationProviderClient? = null
+    private var contactLocation: LatLng? = null
     private var locationCallback: LocationCallback? = null
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private var currentLocation: LatLng? = null
@@ -47,8 +50,7 @@ class CurrentLocationActivity : BaseActivity(), OnMapReadyCallback,
 
     private var googleMap: GoogleMap? = null
     private var address: String? = ""
-    private var marker: Marker? = null
-
+    private var markerOptions: MarkerOptions? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -98,7 +100,7 @@ class CurrentLocationActivity : BaseActivity(), OnMapReadyCallback,
             PermissionUtils.checkAccessFineLocationGranted(this@CurrentLocationActivity) -> {
                 when {
                     PermissionUtils.isLocationEnabled(this@CurrentLocationActivity) -> {
-                        setLocationListener()
+                        initializeGoogleMap()
                     }
 
                     else -> {
@@ -116,7 +118,7 @@ class CurrentLocationActivity : BaseActivity(), OnMapReadyCallback,
     private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
             if (PermissionUtils.isLocationEnabled(this)) {
-                setLocationListener()
+                initializeGoogleMap()
             }
         } else {
             val rationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -126,48 +128,58 @@ class CurrentLocationActivity : BaseActivity(), OnMapReadyCallback,
     }
 
     private fun initializeGoogleMap() {
-//        try {
-            if (googleMap == null) {
-                val fragManager = supportFragmentManager
-                val mapFragment = fragManager.findFragmentById(R.id.googleMapFrag) as SupportMapFragment?
-                mapFragment?.getMapAsync(this)
-            } else {
-                setupGoogleMap()
-            }
-//        } catch (_: Exception) {
-//        }
+        smf = supportFragmentManager.findFragmentById(R.id.googleMapFrag) as SupportMapFragment?
+        client = LocationServices.getFusedLocationProviderClient(this)
+        getMyLocation()
+
     }
 
-    private fun setupGoogleMap() {
-        currentLocation?.let { location ->
-            CoroutineScope(Dispatchers.IO).launch {
-                val differentLocation = Geocoder(this@CurrentLocationActivity, Locale.getDefault())
-                val locationList = differentLocation.getFromLocation(location.latitude, location.longitude, 1)
-                val locationAddress = locationList?.get(0)
-                address = locationAddress?.getAddressLine(0)
 
-            }.invokeOnCompletion {
-                CoroutineScope(Dispatchers.Main).launch {
-                    // Clear the previous marker if it exists
-                    marker?.remove()
-
-                    marker = googleMap?.addMarker(
-                        MarkerOptions()
-                            .title(address.toString())
-                            .position(location)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
-                    )
-
-                    googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 16F))
+    fun getMyLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        val task = client?.lastLocation
+        task?.addOnSuccessListener {
+            it?.let { location ->
+                contactLocation = LatLng(location.latitude, location.longitude)
+                markerOptions = contactLocation?.let {
+                    MarkerOptions().position(it)
+                        .title(resources.getString(R.string.current_location))
                 }
+                showOnMap(15f)
             }
         }
-    }
 
-    override fun onMapReady(p0: GoogleMap) {
-        googleMap = p0
-        googleMap?.setOnMapLongClickListener(this)
-        setupGoogleMap()
+    }
+    private fun showOnMap(fl: Float) {
+        smf?.getMapAsync { googleMap ->
+            markerOptions = contactLocation?.let {
+                MarkerOptions().position(it).title(resources.getString(R.string.current_location))
+            }
+            markerOptions?.let {
+                googleMap.addMarker(markerOptions!!)
+            }
+            contactLocation?.let {
+                googleMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        it, fl
+                    )
+                )
+            }
+        }
     }
 
     override fun onMapLongClick(p0: LatLng) {
@@ -184,52 +196,6 @@ class CurrentLocationActivity : BaseActivity(), OnMapReadyCallback,
 //        } catch (_: Exception) {}
     }
 
-    @SuppressLint("MissingPermission")
-    private fun setLocationListener() {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        // for getting the current location update after every 2 seconds with high accuracy
-        val locationRequest = LocationRequest().setInterval(2000).setFastestInterval(2000)
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult)
-                for (location in locationResult.locations) {
-                    currentLocation = LatLng(location.latitude, location.longitude)
-                    Log.d("currentLocation", "onLocationResult: $currentLocation")
-                    initializeGoogleMap()
-                }
-                // Things don't end here
-                // You may also update the location on your web app
-            }
-        }
-        locationCallback?.let { callback ->
-            fusedLocationProviderClient?.requestLocationUpdates(locationRequest, callback, Looper.getMainLooper())
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            // Location Permission
-            123 -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    when {
-                        PermissionUtils.isLocationEnabled(this) -> {
-                            setupGoogleMap()
-                            // Setting things up
-                        }
-
-                        else -> {
-                            PermissionUtils.showGPSNotEnabledDialog(this)
-                        }
-                    }
-                } else {
-                    Toast.makeText(this, "Not Granted", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()

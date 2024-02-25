@@ -18,8 +18,11 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -57,9 +60,10 @@ import java.io.ByteArrayOutputStream
 import java.util.Locale
 
 
-class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+class ActivityNumberLocator : BaseActivity() {
     var binding: ActivityNumberLocatorBinding? = null
-
+    private var smf: SupportMapFragment? = null
+    private var client: FusedLocationProviderClient? = null
     private var countryName: String? = null
     private var countryCode: String? = null
     private var countryCodeString: String? = null
@@ -75,7 +79,7 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
     var nativeAd: NativeAd? = null
     private val TAG = "Number_Locator"
     private var mapFragment: SupportMapFragment? = null
-
+    private var markerOptions: MarkerOptions? = null
     private var reviewManager: ReviewManager? = null
     private var reviewInfo: ReviewInfo? = null
 
@@ -94,8 +98,19 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
         initEvents()
 
         loadAd()
+    }
 
-        initReviewManager()
+
+    private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+            if (PermissionUtils.isLocationEnabled(this)) {
+                initializeGoogleMap()
+            }
+        } else {
+            val rationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+            if (!rationale)
+                PermissionUtils.showGPSNotEnabledDialog(this)
+        }
     }
 
     private fun initViews() {
@@ -108,6 +123,24 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
             countryCodePicker.setCountryForNameCode(countryCode)
             countryCodePicker.setPhoneNumberValidityChangeListener { isValidNumber ->
                 numberIsValid = isValidNumber
+            }
+        }
+
+        when {
+            PermissionUtils.checkAccessFineLocationGranted(this@ActivityNumberLocator) -> {
+                when {
+                    PermissionUtils.isLocationEnabled(this@ActivityNumberLocator) -> {
+                        initializeGoogleMap()
+                    }
+
+                    else -> {
+                        PermissionUtils.showGPSNotEnabledDialog(this@ActivityNumberLocator)
+                    }
+                }
+            }
+
+            else -> {
+                PermissionUtils.requestLocationPermission(locationPermissionLauncher)
             }
         }
     }
@@ -163,7 +196,8 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
 
             enterNUmber.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                    val locationManager =
+                        getSystemService(Context.LOCATION_SERVICE) as LocationManager
                     if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                         showGPSDIALOGE()
                         showMsg("Please Turn On Your Mobile GPS")
@@ -230,26 +264,27 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
                             contactLocation = getUserLocation(countryName)
                         }.invokeOnCompletion {
                             CoroutineScope(Dispatchers.Main).launch {
-                                initializeGoogleMap()
-                            contactLocation?.let {
-                                try {
-                                    nativeAd?.let { it1 ->
-                                        showLoadedNativeAd(
-                                            this@ActivityNumberLocator,
-                                            binding?.layoutNative!!,
-                                            R.layout.native_ad_larg_layout,
-                                            it1
-                                        )
+                                contactLocation?.let {
+                                    showOnMap(7f)
+                                    try {
+                                        nativeAd?.let { it1 ->
+                                            showLoadedNativeAd(
+                                                this@ActivityNumberLocator,
+                                                binding?.layoutNative!!,
+                                                R.layout.native_ad_larg_layout,
+                                                it1
+                                            )
+                                        }
+                                        detialBottomSheet.visibility = View.VISIBLE
+                                        countryFlag.setImageBitmap(bitMap)
+                                        contactNo.text = countryCode + " " + mobileNumber
+                                        contryName.text = countryName
+                                        contryCode.text = countryCodeString
+                                    } catch (ee: Exception) {
                                     }
-                                    detialBottomSheet.visibility = View.VISIBLE
-                                    countryFlag.setImageBitmap(bitMap)
-                                    contactNo.text = countryCode + " " + mobileNumber
-                                    contryName.text = countryName
-                                    contryCode.text = countryCodeString
-                                } catch (ee: Exception) {
                                 }
                             }
-                        } }
+                        }
 
                     } else {
                         showMsg("Kindly Check your Internet Connection")
@@ -294,80 +329,70 @@ class ActivityNumberLocator : BaseActivity(), OnMapReadyCallback, GoogleMap.OnMa
     }
 
     private fun initializeGoogleMap() {
-        try {
-            if (googleMap == null) {
-                val fragManager = supportFragmentManager
-                mapFragment = fragManager.findFragmentById(R.id.googleMap) as SupportMapFragment?
-                mapFragment?.getMapAsync(this)
-            } else {
-                setupGoogleMap()
-            }
-        }catch (_: Exception){}
+        smf = supportFragmentManager.findFragmentById(R.id.googleMap) as SupportMapFragment?
+        client = LocationServices.getFusedLocationProviderClient(this)
+        Log.d(TAG, "initializeGoogleMap: 00")
+        getMyLocation()
     }
 
-    private fun setupGoogleMap() {
-        contactLocation?.let {
-            try {
-                googleMap?.addMarker(MarkerOptions().position(it))
-                googleMap?.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(it, 16F),
-                    3000,
-                    null
+    fun getMyLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        val task = client?.lastLocation
+        task?.addOnSuccessListener {
+            it?.let { location ->
+                Log.d(TAG, "getMyLocation: 1")
+                contactLocation = LatLng(location.latitude, location.longitude)
+                markerOptions = contactLocation?.let {
+                    MarkerOptions().position(it)
+                        .title(resources.getString(R.string.current_location))
+                }
+                Log.d(TAG, "getMyLocation: 2")
+                showOnMap(15f)
+            }
+        }
+
+    }
+
+    private fun showOnMap(fl: Float) {
+        Log.d(TAG, "showOnMap: $smf")
+        smf?.getMapAsync { googleMap ->
+            Log.d(TAG, "showOnMap:2 ")
+            markerOptions = contactLocation?.let {
+                MarkerOptions().position(it).title(resources.getString(R.string.current_location))
+            }
+            markerOptions?.let {
+                googleMap.addMarker(markerOptions!!)
+            }
+            contactLocation?.let {
+                googleMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        it, fl
+                    )
                 )
-            } catch (e: NullPointerException) {
-                Log.e(TAG, "${e.message}")
             }
         }
     }
 
-    override fun onMapReady(p0: GoogleMap) {
-        try {
-            googleMap = p0
-            googleMap?.setOnMapLongClickListener(this)
-            setupGoogleMap()
-        } catch (_: Exception){}
-    }
-
-    override fun onMapLongClick(p0: LatLng) {
-        try {
-            lat = p0.latitude
-            long = p0.longitude
-            val differentLocation = Geocoder(this, Locale.getDefault())
-            val locationList = differentLocation.getFromLocation(lat!!, long!!, 1)
-            if (!locationList.isNullOrEmpty()) {
-                val locationAddress = locationList[0]
-                var addressStr: String? = ""
-                addressStr += locationAddress?.getAddressLine(0)
-                Toast.makeText(this, "" + addressStr, Toast.LENGTH_SHORT).show()
-                if (googleMap != null) {
-                    googleMap?.addMarker(
-                        MarkerOptions()
-                            .position(p0)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                    )
-                }
-            }
-        } catch (_: Exception){}
-    }
 
     override fun onBackPressed() {
         if (binding?.detialBottomSheet?.visibility == View.VISIBLE) {
             binding?.detialBottomSheet?.visibility = View.GONE
         } else {
-           try{
-               val flow = reviewManager?.launchReviewFlow(
-                   this@ActivityNumberLocator,
-                   reviewInfo!!
-               )
-               flow?.addOnCompleteListener { task: Task<Void?>? ->
-                   if (task != null){
-                       super.onBackPressed()
-                   }else{
-                       super.onBackPressed()
-                   }
-               }
-           }catch (_:Exception){}
-
+            super.onBackPressed()
         }
     }
 
